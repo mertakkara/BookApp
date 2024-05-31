@@ -13,7 +13,7 @@ namespace BookApp.Data
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True;Database=Book");
+            optionsBuilder.UseSqlServer(Configuration.GetConnectionString("DatabaseConnection"));
 
         }
 
