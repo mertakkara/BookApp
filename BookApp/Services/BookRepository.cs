@@ -6,8 +6,8 @@ namespace BookApp.Services
 {
     public class BookRepository : IBookRepository
     {
-        private readonly DBContextClass _dbContext;
-        public BookRepository(DBContextClass dbContext)
+        private readonly ApplicationDbContext _dbContext;
+        public BookRepository(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
         }

@@ -2,6 +2,7 @@
 using BookApp.Interface;
 using BookApp.Model;
 using BookApp.RabbitMQ;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookApp.Controllers
@@ -22,8 +23,8 @@ namespace BookApp.Controllers
             _unitOfWork = unitOfWork;
         }
 
-
         [HttpGet("booklist")]
+        [Authorize]
         public IActionResult GetProducts()
         {
             var books = _unitOfWork.Books.GetAll();
@@ -31,6 +32,7 @@ namespace BookApp.Controllers
         }
 
         [HttpGet("book/{id}")]
+        [Authorize]
         public IActionResult GetProduct(int id)
         {
             var product = _unitOfWork.Books.GetById(id);
@@ -42,6 +44,7 @@ namespace BookApp.Controllers
         }
 
         [HttpPost("addbook")]
+        [Authorize]
         public IActionResult AddProduct([FromBody] Book book)
         {
             _unitOfWork.Books.Add(book);
@@ -51,6 +54,7 @@ namespace BookApp.Controllers
         }
 
         [HttpPut("updatebook")]
+        [Authorize]
         public IActionResult UpdateProduct([FromBody] Book book)
         {
             _unitOfWork.Books.Update(book);
@@ -59,6 +63,7 @@ namespace BookApp.Controllers
         }
 
         [HttpDelete("deletebook/{id}")]
+        [Authorize]
         public IActionResult DeleteProduct(int id)
         {
             var result = _unitOfWork.Books.Delete(id);

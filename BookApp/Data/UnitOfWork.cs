@@ -6,9 +6,9 @@ namespace BookApp.Data
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly DBContextClass _context;
+        private readonly ApplicationDbContext _context;
 
-        public UnitOfWork(DBContextClass context)
+        public UnitOfWork(ApplicationDbContext context)
         {
             _context = context;
             Books = new BookRepository(_context);
