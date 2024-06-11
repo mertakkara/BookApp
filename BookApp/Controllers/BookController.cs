@@ -1,9 +1,11 @@
-﻿using BookApp.Data;
+﻿using Azure;
+using BookApp.Data;
 using BookApp.Interface;
 using BookApp.Model;
 using BookApp.RabbitMQ;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace BookApp.Controllers
 {
@@ -23,55 +25,94 @@ namespace BookApp.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        [HttpGet("booklist")]
-        [Authorize]
-        public IActionResult GetProducts()
-        {
-            var books = _unitOfWork.Books.GetAll();
-            return Ok(books);
-        }
-
         [HttpGet("book/{id}")]
         [Authorize]
-        public IActionResult GetProduct(int id)
+        public async Task<IActionResult> GetProduct(int id)
         {
-            var product = _unitOfWork.Books.GetById(id);
-            if (product == null)
+            ApiResponse<Book> response = new ApiResponse<Book>();
+
+            try
             {
-                return NotFound();
+                var product = await _unitOfWork.Books.GetById(id);
+                if (product == null)
+                {
+                    response.Success = false;
+                    response.Message = "Item not found.";
+                    return NotFound(response);  
+                }
+
+                response.Success = true;
+                response.Message = "Item retrieved successfully.";
+                response.Data = product;
+                return Ok(response);         
             }
-            return Ok(product);
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = "An error occurred.";
+                response.Errors.Add(ex.Message);
+                return StatusCode(500, response); 
+            }
         }
 
         [HttpPost("addbook")]
         [Authorize]
-        public IActionResult AddProduct([FromBody] Book book)
+        public async Task<IActionResult> AddProduct([FromBody] Book book)
         {
-            _unitOfWork.Books.Add(book);
-            _unitOfWork.Complete();
-            _rabbitMQProducer.SendBookMessage("added");
-            return Ok("added");
+            ApiResponse<string> response = new ApiResponse<string>();
+
+            try
+            {
+                var result = await _unitOfWork.Books.Add(book);
+                _unitOfWork.Complete();
+                _rabbitMQProducer.SendBookMessage("added");
+
+                response.Success = result;
+                response.Message = "success";
+                response.Data = "User created successfully!!";
+                return Ok(response);         
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+                response.Data = "User createdtion failed!!";
+                return StatusCode(500, response); 
+            }
         }
 
         [HttpPut("updatebook")]
         [Authorize]
-        public IActionResult UpdateProduct([FromBody] Book book)
+        public async Task<IActionResult> UpdateProduct([FromBody] Book book)
         {
-            _unitOfWork.Books.Update(book);
-            _unitOfWork.Complete();
-            return Ok("updated");
+            ApiResponse<string> response = new ApiResponse<string>();
+            var result = await _unitOfWork.Books.Update(book);
+            if (result)
+            {
+                response.Success = true;
+                response.Message = "Item updated successfully.";
+                return Ok(response);
+            }
+            response.Success = false;
+            response.Message = "Item not found.";
+            return NotFound(response);
         }
 
         [HttpDelete("deletebook/{id}")]
         [Authorize]
-        public IActionResult DeleteProduct(int id)
+        public async Task<IActionResult> DeleteProduct(int id)
         {
-            var result = _unitOfWork.Books.Delete(id);
-            if (result)
+            ApiResponse<string> response = new ApiResponse<string>();
+            var product = await _unitOfWork.Books.Delete(id);
+            if (product)
             {
-                return Ok();
+                response.Success = true;
+                response.Message = "Item deleted successfully.";
+                return Ok(response);
             }
-            return NotFound();
+            response.Success = false;
+            response.Message = "Item not found.";
+            return NotFound(response);
         }
     }
 }

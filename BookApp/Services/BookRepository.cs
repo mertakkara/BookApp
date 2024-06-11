@@ -1,6 +1,7 @@
 ﻿using BookApp.Data;
 using BookApp.Interface;
 using BookApp.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookApp.Services
 {
@@ -11,15 +12,16 @@ namespace BookApp.Services
         {
             _dbContext = dbContext;
         }
-        public void Add(Book book)
+        public async Task<bool> Add(Book book)
         {
-            var result = _dbContext.Books.Add(book);
+            var result = await _dbContext.Books.AddAsync(book);
             _dbContext.SaveChanges();
+            return true;
         }
 
-        public bool Delete(int id)
+        public async Task<bool> Delete(int id)
         {
-            var result = _dbContext.Books.FirstOrDefault(x => x.BookID == id);
+            var result = await _dbContext.Books.FirstOrDefaultAsync(x => x.BookID == id);
             if (result != null)
             {
                 _dbContext.Books.Remove(result);
@@ -29,20 +31,27 @@ namespace BookApp.Services
             return false;
         }
 
-        public IEnumerable<Book> GetAll()
+        public async Task<Book> GetById(int id)
         {
-            return _dbContext.Books.ToList();
+            var result = await _dbContext.Books.FirstOrDefaultAsync(x => x.BookID == id);
+            if(result != null)
+                return result;
+            return new Book();
         }
 
-        public Book GetById(int id)
+        public async Task<bool> Update(Book book)
         {
-            return _dbContext.Books.FirstOrDefault(x => x.BookID == id);
-        }
+            var user = await _dbContext.Books.FirstOrDefaultAsync(x=>x.BookID ==  book.BookID);
+            if (user == null)
+                return false;
 
-        public void Update(Book book)
-        {
-            var result = _dbContext.Books.Update(book);
-            _dbContext.SaveChanges();
+            user.BookPrice = book.BookPrice;
+            user.BookDescription = book.BookDescription;
+            user.BookName = book.BookName;
+            user.BookStock = book.BookStock;
+            var result = _dbContext.Books.Update(user);
+            await _dbContext.SaveChangesAsync();
+            return true;    
         }
     }
 }

@@ -4,10 +4,9 @@ namespace BookApp.Interface
 {
     public interface IBookRepository
     {
-        IEnumerable<Book> GetAll();
-        Book GetById(int id);
-        void Add(Book book);
-        void Update(Book book);
-        bool Delete(int id);
+        Task<Book> GetById(int id);
+        Task<bool> Add(Book book);
+        Task<bool> Update(Book book);
+        Task<bool> Delete(int id);
     }
 }
