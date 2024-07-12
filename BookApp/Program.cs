@@ -3,6 +3,8 @@ using BookApp.Interface;
 using BookApp.Model;
 using BookApp.RabbitMQ;
 using BookApp.Services;
+using DinkToPdf;
+using DinkToPdf.Contracts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +26,7 @@ namespace BookApp
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IRabbitMQBook, RabbitMQBook>();
             builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("DatabaseConnection")));
+            builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));  
             builder.Services.AddControllers();
            
             builder.Services.AddEndpointsApiExplorer();
