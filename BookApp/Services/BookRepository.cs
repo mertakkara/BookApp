@@ -24,7 +24,7 @@ namespace BookApp.Services
             var result = await _dbContext.Books.FirstOrDefaultAsync(x => x.BookID == id);
             if (result != null)
             {
-                _dbContext.Books.Remove(result);
+                result.DeletedAt = DateTime.Now;
                 _dbContext.SaveChanges();
                 return true;
             }
@@ -36,7 +36,7 @@ namespace BookApp.Services
             var result = await _dbContext.Books.FirstOrDefaultAsync(x => x.BookID == id);
             if(result != null)
                 return result;
-            return new Book();
+            return null;
         }
 
         public async Task<bool> Update(Book book)

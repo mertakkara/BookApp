@@ -109,6 +109,9 @@ namespace BookApp.Migrations
                     b.Property<int>("BookStock")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("BookID");
 
                     b.ToTable("Books");

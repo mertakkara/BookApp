@@ -1,11 +1,9 @@
-﻿using Azure;
-using BookApp.Data;
+﻿using BookApp.Data;
 using BookApp.Interface;
 using BookApp.Model;
 using BookApp.RabbitMQ;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace BookApp.Controllers
 {

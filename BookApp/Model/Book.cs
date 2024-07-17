@@ -7,5 +7,7 @@
         public string BookDescription { get; set; } = string.Empty;
         public int BookPrice { get; set; }
         public int BookStock { get; set; }
+
+        public DateTime? DeletedAt { get; set; }
     }
 }
