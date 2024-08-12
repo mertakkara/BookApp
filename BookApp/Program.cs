@@ -31,10 +31,12 @@ namespace BookApp
             builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("DatabaseConnection")));
             builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));  
             builder.Services.AddControllers();
+            builder.Services.Configure<GzipCompressionProviderOptions>(options =>
+            { options.Level = System.IO.Compression.CompressionLevel.Fastest; });
             builder.Services.AddResponseCompression(options =>
             {
                 options.Providers.Add<GzipCompressionProvider>();
-	            options.Providers.Add<BrotliCompressionProvider>();
+                options.EnableForHttps = true;
 	        });
 
             builder.Services.AddEndpointsApiExplorer();
@@ -73,7 +75,7 @@ namespace BookApp
             app.UseAuthorization();
 
             app.MapControllers();
-
+            app.UseResponseCompression();
             app.Run();
         }
     }
