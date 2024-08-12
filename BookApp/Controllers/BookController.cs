@@ -4,10 +4,10 @@ using BookApp.Model;
 using BookApp.RabbitMQ;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace BookApp.Controllers
 {
+    [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any)]
     [Route("api/[controller]")]
     [ApiController]
     public class BookController : ControllerBase

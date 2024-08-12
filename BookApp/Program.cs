@@ -23,6 +23,7 @@ namespace BookApp
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddResponseCaching();
             ConfigurationManager configuration = builder.Configuration;
 
             builder.Services.AddScoped<IBookRepository, BookRepository>();
@@ -63,6 +64,7 @@ namespace BookApp
        
 
             var app = builder.Build();
+            app.UseResponseCaching();
             app.UseMiddleware<CustomNotAcceptableMiddleware>();
             if (app.Environment.IsDevelopment())
             {
