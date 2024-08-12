@@ -1,5 +1,6 @@
 using BookApp.Data;
 using BookApp.Interface;
+using BookApp.Middlewares;
 using BookApp.Model;
 using BookApp.RabbitMQ;
 using BookApp.Services;
@@ -7,7 +8,9 @@ using DinkToPdf;
 using DinkToPdf.Contracts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -28,7 +31,12 @@ namespace BookApp
             builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("DatabaseConnection")));
             builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));  
             builder.Services.AddControllers();
-           
+            builder.Services.AddResponseCompression(options =>
+            {
+                options.Providers.Add<GzipCompressionProvider>();
+	            options.Providers.Add<BrotliCompressionProvider>();
+	        });
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -53,12 +61,13 @@ namespace BookApp
        
 
             var app = builder.Build();
+            app.UseMiddleware<CustomNotAcceptableMiddleware>();
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+           
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();

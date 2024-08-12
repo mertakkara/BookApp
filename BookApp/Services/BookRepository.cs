@@ -1,6 +1,7 @@
 ﻿using BookApp.Data;
 using BookApp.Interface;
 using BookApp.Model;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookApp.Services
@@ -29,6 +30,12 @@ namespace BookApp.Services
                 return true;
             }
             return false;
+        }
+
+        public async Task<List<Book>> GetBooks()
+        {
+            var result = await _dbContext.Books.ToListAsync();
+	        return result;
         }
 
         public async Task<Book> GetById(int id)

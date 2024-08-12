@@ -4,6 +4,7 @@ using BookApp.Model;
 using BookApp.RabbitMQ;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookApp.Controllers
 {
@@ -21,6 +22,16 @@ namespace BookApp.Controllers
             _bookRepository = bookRepository;
             _rabbitMQProducer = rabbitMQProducer;
             _unitOfWork = unitOfWork;
+        }
+        [HttpGet("books")]
+        //[Authorize]
+        public async Task<IActionResult> GetBooks(int lastItemId = 0, int pageSize = 10)
+        {
+            var items = await _unitOfWork.Books.GetBooks();
+            var item =  items.Where(i => i.BookID > lastItemId)
+            .OrderBy(i => i.BookID).Take(pageSize)
+           .ToList();
+            return Ok(item);
         }
 
         [HttpGet("book/{id}")]
