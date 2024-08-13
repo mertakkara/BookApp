@@ -1,4 +1,5 @@
 ﻿using BookApp.Data;
+using BookApp.Exceptions;
 using BookApp.Interface;
 using BookApp.Model;
 using BookApp.RabbitMQ;
@@ -65,27 +66,31 @@ namespace BookApp.Controllers
         }
 
         [HttpPost("addbook")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> AddProduct([FromBody] Book book)
         {
             ApiResponse<string> response = new ApiResponse<string>();
 
             try
             {
+                if (book.BookStock < 0)
+                {
+                    throw new InvalidBookStockException(book.BookStock);
+                }
                 var result = await _unitOfWork.Books.Add(book);
                 _unitOfWork.Complete();
                 _rabbitMQProducer.SendBookMessage("added");
 
                 response.Success = result;
                 response.Message = "success";
-                response.Data = "User created successfully!!";
+                response.Data = "Book created successfully!!";
                 return Ok(response);         
             }
             catch (Exception ex)
             {
                 response.Success = false;
                 response.Message = ex.Message;
-                response.Data = "User createdtion failed!!";
+                response.Data = "Book creation failed!!";
                 return StatusCode(500, response); 
             }
         }
