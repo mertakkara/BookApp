@@ -47,12 +47,12 @@ namespace BookApp.Controllers
                 if (product == null)
                 {
                     response.Success = false;
-                    response.Message = "Item not found.";
+                    response.Message = "Book not found.";
                     return NotFound(response);  
                 }
 
                 response.Success = true;
-                response.Message = "Item retrieved successfully.";
+                response.Message = "Book retrieved successfully.";
                 response.Data = product;
                 return Ok(response);         
             }
@@ -104,11 +104,11 @@ namespace BookApp.Controllers
             if (result)
             {
                 response.Success = true;
-                response.Message = "Item updated successfully.";
+                response.Message = "Book updated successfully.";
                 return Ok(response);
             }
             response.Success = false;
-            response.Message = "Item not found.";
+            response.Message = "Book not found.";
             return NotFound(response);
         }
 
@@ -121,11 +121,11 @@ namespace BookApp.Controllers
             if (product)
             {
                 response.Success = true;
-                response.Message = "Item deleted successfully.";
+                response.Message = "Book deleted successfully.";
                 return Ok(response);
             }
             response.Success = false;
-            response.Message = "Item not found.";
+            response.Message = "Book not found.";
             return NotFound(response);
         }
     }
